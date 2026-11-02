@@ -1,27 +1,19 @@
 {
-  "schema": "webshop-public-frozen-sft-v1",
-  "train_good": 7500,
-  "train_bad": 4500,
-  "validation_good": 631,
-  "validation_bad": 271,
-  "generation_good": 100,
-  "generation_bad": 100,
-  "source_collection_model": "Qwen/Qwen2.5-3B-Instruct",
-  "source_collection_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
-  "source_manifest_sha256": "be18ecf06a2f92d515ed9d16d0ed81954fd47a02bd45a87076be46f397e9afd2",
-  "files": {
-    "train.jsonl": {
-      "bytes": 71268028,
-      "sha256": "db060c4703fa0b0fba767696d32597be6d2bc22d7e9067ca054c6b0776180888"
-    },
-    "val.jsonl": {
-      "bytes": 5199383,
-      "sha256": "7d344341478091fd5bb9e592bcd25f4e563d12ac05131b5234fd79ad30d85fd1"
-    },
-    "generation_val200.jsonl": {
-      "bytes": 1157450,
-      "sha256": "85d40da59056ee405d4b99f5cad044f46d0567a3b405efcd97cd0ad2a18b9047"
-    }
+  "train_counts": {
+    "bad": 6000,
+    "good": 10000
   },
-  "bundle_sha256": "d15fefd08f2707ff93eff7f6aa55c82f5ac2f2e307c3f4b904b9ce98d075d1f7"
+  "val_counts": {
+    "bad": 128,
+    "good": 128
+  },
+  "files": {
+    "route_sft/excluded.jsonl": "38cca28fb8ffcad2d5c7f1257191400c9a4109dfe82549611f182f1465b69ebe",
+    "route_sft/generation_val32.jsonl": "528803ea31cea53a60a6bb0e0c83e7e2903ae6a13d2f06523785b82b43cf4d64",
+    "route_sft/train.jsonl": "9eaca5a3de47e2b173a4efb75c8dcf4822a4a49ecde129e6770d9739f7112ecb",
+    "route_sft/val.jsonl": "ecbaffe47d13d11d35ec4449e2e606fd24fe9a7aa0a4150081652adbc71dc678",
+    "route_sft/manifest.json": "2d33d11e7ee27f1155e9d455d0d085b7c5b75741fc9cdd34ca9ef627e057b9aa",
+    "reviewed_pool.jsonl.gz": "26901fe70198149420e898458d85ccd56a93d3bd1771909815ab1e057b6d4f87",
+    "selection_ids.json": "25b4cddbf1c4bbfdb18676688182538a9a0da22eb0731d142fc4e339d2bd88b3"
+  }
 }

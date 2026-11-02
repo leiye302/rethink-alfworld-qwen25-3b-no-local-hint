@@ -1,0 +1,15 @@
+name: alfworld-qwen25-3b-no-local-hint
+owner: null
+stage: preparation
+backbone: Qwen/Qwen2.5-3B-Instruct
+variant: no_local_hint
+initialization: shared-full-route-sft-step2000
+benchmark: ALFWorld valid_seen140
+metric: task_success_rate
+training_updates: 150
+gate_beta: 5
+training_uses_API: false
+evaluation_uses_API: false
+GPU_training_executed: false
+best_result: null
+next_milestone: Verify allocated GPU runtime, then explicitly launch150 updates

@@ -1,0 +1,13 @@
+Built with Qwen.
+
+Qwen is licensed under the Qwen RESEARCH LICENSE AGREEMENT, Copyright (c) Alibaba Cloud. All Rights Reserved.
+
+Modification notice: all model-00001-of-00007.safetensors through
+model-00007-of-00007.safetensors are modified model weights, fine-tuned from
+Qwen/Qwen2.5-3B-Instruct with full-correction Route-SFT to step2000.
+The accompanying tokenizer/configuration adds the RETHINK token and related
+model vocabulary configuration. Original public weight files and tokenizer
+files are distributed without further changes from that saved checkpoint.
+The model is for non-commercial research/evaluation under the accompanying
+Qwen Research License. The repository's Apache-2.0 code license does not
+replace the model license.

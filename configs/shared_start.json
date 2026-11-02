@@ -1,0 +1,89 @@
+{
+  "schema": "original_alfworld_full_sft2000_v1",
+  "step": 2000,
+  "base_model": "Qwen/Qwen2.5-3B-Instruct",
+  "base_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+  "supervision": "full_suffix_ce_plus_marker_bce",
+  "release_repository": "leiye302/rethink-alfworld-qwen25-3b-no-local-hint",
+  "release_tag": "full-route-sft2000-v1",
+  "files": {
+    "added_tokens.json": {
+      "bytes": 628,
+      "sha256": "cfd9cf1a2b9c590e08143158dd8064eef442956e2f3f4474c93e20704e4382d7"
+    },
+    "config.json": {
+      "bytes": 684,
+      "sha256": "da91ad8c8cc5884b38ecaadd8775bec1555f0c131246ed50fbae277d68d9af9c"
+    },
+    "generation_config.json": {
+      "bytes": 243,
+      "sha256": "80b8ec6e7991b64763e4ff29b59a9cd2968b390d0736e0dc586585da04bad013"
+    },
+    "merges.txt": {
+      "bytes": 1671853,
+      "sha256": "8831e4f1a044471340f7c0a83d7bd71306a5b867e95fd870f74d0c5308a904d5"
+    },
+    "model-00001-of-00007.safetensors": {
+      "bytes": 1989215912,
+      "sha256": "4f4ad743d3ef8b014b235f00df2011247413bf74a032c34417e84eb2362350f5"
+    },
+    "model-00002-of-00007.safetensors": {
+      "bytes": 1940033552,
+      "sha256": "f8939762a5386749a85b4340fabf74461aa6ca180a563fccb97c1e3a5a055431"
+    },
+    "model-00003-of-00007.safetensors": {
+      "bytes": 1977809984,
+      "sha256": "8163a9cfe6d0cb21bc938aed94c810ab21e9c657f0bc5fb069eedb2fc6292932"
+    },
+    "model-00004-of-00007.safetensors": {
+      "bytes": 1940033624,
+      "sha256": "eff462b0dc6da42240ccca4e34810647480a879b58a938b1d724bc2b88700652"
+    },
+    "model-00005-of-00007.safetensors": {
+      "bytes": 1940033624,
+      "sha256": "b2cc2aeb4dcf2dbf95ea0ec91ac8b44421ebd164e2e8b15040964680031dfb03"
+    },
+    "model-00006-of-00007.safetensors": {
+      "bytes": 1977810000,
+      "sha256": "e4de370339426a9c50d232615745383282de708e11187f68d782b879eaf22eb5"
+    },
+    "model-00007-of-00007.safetensors": {
+      "bytes": 578867168,
+      "sha256": "b50b2ed18a3b2721465c404275082aaa4fe20ab959d136ea522e1b7f45d10b2d"
+    },
+    "model.safetensors.index.json": {
+      "bytes": 35582,
+      "sha256": "6dbf479ebe7fb905b28019af94518d250d15b3c0f6495630680cb7ae6737b5e8"
+    },
+    "sft_stage_manifest.json": {
+      "bytes": 7261,
+      "sha256": "59bc680676e9590e9e199b823c956ad3317fb985ea138eac790b589af30bb700"
+    },
+    "special_tokens_map.json": {
+      "bytes": 756,
+      "sha256": "79948c5bbe29ea19d71627f747b330cef8fb819ef1f96538d79b1e14a01b01bd"
+    },
+    "tokenizer.json": {
+      "bytes": 11422082,
+      "sha256": "5d517fa060dc44dc8a3b6ecfd995d6a838ba53a30964d8f0210d7b08d891d623"
+    },
+    "tokenizer_config.json": {
+      "bytes": 7529,
+      "sha256": "2e2527c509c44f64f6e7a9523117e81664db3c3f71713399711762cb967146f4"
+    },
+    "vocab.json": {
+      "bytes": 2776833,
+      "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910"
+    }
+  },
+  "legal_files": {
+    "model_license.txt": {
+      "bytes": 7388,
+      "sha256": "ef52482bb785733093dc9a2e8edd8e764c77d12d8e9d8f10a80c9b547d32d0f9"
+    },
+    "Notice.txt": {
+      "bytes": 741,
+      "sha256": "e0a3d9906277c5f56ba97a03499742e29072c8e28d0d9342aae3cdd4f7c52bba"
+    }
+  }
+}
