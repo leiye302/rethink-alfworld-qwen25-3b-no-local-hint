@@ -1,4 +1,4 @@
-"""Explicit native SDAR launch; no secrets in command arguments or Hydra config."""
+"""Same Route-SFT1500 initialization, ordinary GRPO+OPSD, no local hint API."""
 import argparse
 import json
 import os
@@ -28,12 +28,12 @@ def resolved(actor,output,baseline=False):
        'data.val_files':str(ROOT/'datasets/rl/text/test.parquet'),
        'actor_rollout_ref.model.path':str(actor),
        'algorithm.sdar.skills_dir':str(UPSTREAM/'skills/webshop'),
-       'algorithm.local_hints.enabled':not baseline,
+       'algorithm.local_hints.enabled':False,
        'algorithm.local_hints.audit_dir':str(output/'hints'),
        'trainer.default_local_dir':str(output/'checkpoints'),
        'trainer.rollout_data_dir':str(output/'rollouts'),
        'trainer.validation_data_dir':str(output/'validation'),
-       'trainer.experiment_name':'baseline' if baseline else 'rethink',
+       'trainer.experiment_name':'sft_start_grpo_opsd',
        'ray_init.address':'local',
        'ray_init.runtime_env.env_vars.RETHINK_RUN_DIR':str(output),
        'ray_init.runtime_env.env_vars.PYTHONPATH':os.pathsep.join([str(ROOT/'src'),str(UPSTREAM)]),
@@ -98,20 +98,22 @@ def resume_checkpoint(output):
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--baseline',action='store_true',help='Same public GRPO+OPSD beta5 from base, no local hints')
-    p.add_argument('--actor',help='Project-relative Actor override; default is released/locally trained SFT1500')
-    p.add_argument('--run-dir',default='runs/opsd')
-    p.add_argument('--allow-api-cost',action='store_true')
+    p.add_argument('--baseline',action='store_true',help=argparse.SUPPRESS)
+    p.add_argument('--actor',help='Project-relative exact released Route-SFT1500; all file hashes must match')
+    p.add_argument('--run-dir',default='runs/sft_start_grpo_opsd')
     p.add_argument('--prepare-only',action='store_true')
     p.add_argument('--resume',action='store_true')
     p.add_argument('--eval-only',action='store_true',help='Shared140 native vLLM evaluation; no API or optimizer update')
     a=p.parse_args(argv)
+    if a.baseline:
+        p.error('This ablation must start from the same Route-SFT1500 model, not --baseline/base')
     if a.eval_only and a.resume:
         p.error('--eval-only cannot resume a training curve')
+    from .ablation import verify_recipe, verify_initialization
+    verify_recipe()
     from .setup import verify_framework
     verify_framework(); placeholders()
-    size=load('model.json')['size']
-    default='assets/base' if a.baseline else ('assets/route-sft1500' if size=='3b' else 'runs/sft/checkpoint_001500/model')
+    default='assets/route-sft1500'
     actor=confined(a.actor or default)
     output=confined(a.run_dir)
     cfg=resolved(actor,output,a.baseline)
@@ -131,6 +133,8 @@ def main(argv=None):
     from .assets import verify as verify_assets
     verify_assets()
     identity=validate_actor(actor,a.baseline or a.eval_only)
+    if not a.eval_only:
+        verify_initialization(actor,identity)
     output.mkdir(parents=True,exist_ok=True)
     receipt=output/'launch_identity.json'
     if receipt.exists() and not a.resume:
@@ -141,30 +145,10 @@ def main(argv=None):
                      'actor':str(actor.relative_to(ROOT)),'validation_sha256':sha(ROOT/'configs/fixed_validation140.json'),
                      'task_split_sha256':sha(ROOT/'configs/task_split.json'),
                      'evaluation_protocol_sha256':sha(ROOT/'configs/evaluation_protocol.json'),
-                     'world_size':WORLD_SIZE,'rollout_tensor_parallel':2,'eval_only':a.eval_only})
+                     'world_size':WORLD_SIZE,'rollout_tensor_parallel':2,'eval_only':a.eval_only,
+                     'ablation_contract_sha256':sha(ROOT/'configs/ablation.json')})
     if a.resume and (not receipt.exists() or json.loads(receipt.read_text())!=identity):
         raise ValueError('Resume Actor/recipe/validation identity mismatch')
-    private=None
-    if not a.baseline and not a.eval_only:
-        if not a.allow_api_cost:
-            p.error('Method uses an external API: --allow-api-cost is required')
-        if not all(os.environ.get(k) for k in ['HINT_API_BASE','HINT_MODEL','HINT_API_KEY']):
-            p.error('Set HINT_API_BASE, HINT_MODEL and HINT_API_KEY in environment, not CLI/config')
-        from .hint_api import MODEL
-        if os.environ['HINT_MODEL']!=MODEL:
-            p.error('This recipe is pinned to ALFWorld-final glm-5.3-flash; do not substitute the SFT annotation model')
-        private=output/'private/hint_auth.json'; private.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
-        fd=os.open(private,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
-        with os.fdopen(fd,'w') as f:
-            json.dump({'base':os.environ['HINT_API_BASE'],'model':os.environ['HINT_MODEL'],'key':os.environ.pop('HINT_API_KEY')},f)
-        os.chmod(private,0o600)
-        os.environ['RETHINK_HINT_AUTH']=str(private)
-        from .hint_api import auth, trust_environment_proxy
-        auth()  # Validate without a paid request.
-        proxy_mode=trust_environment_proxy()
-        OmegaConf.update(cfg,'ray_init.runtime_env.env_vars.RETHINK_HINT_AUTH',str(private),force_add=True)
-        OmegaConf.update(cfg,'ray_init.runtime_env.env_vars.RETHINK_HINT_TRUST_ENV',
-                         'true' if proxy_mode else 'false',force_add=True)
     cfg.trainer.resume_mode='resume_path' if a.resume else 'disable'
     if a.resume:
         cfg.trainer.resume_from_path=str(resume_checkpoint(output))
@@ -182,8 +166,6 @@ def main(argv=None):
         run_sdar(cfg)
     finally:
         ray.shutdown()
-        if private and private.is_file():
-            private.unlink()
 
 
 if __name__=='__main__':

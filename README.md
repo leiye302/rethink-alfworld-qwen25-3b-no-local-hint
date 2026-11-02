@@ -1,61 +1,42 @@
-# RETHINK WebShop — Qwen2.5-3B
+# WebShop3B ablation: same Route-SFT start, ordinary GRPO+OPSD
 
-> Shared cross-method evaluation: [exact common140 tasks and unchanged sampling](docs/SHARED_EVALUATION140.md).
+Same-start, **no-local-hint** control for [RETHINK WebShop3B](https://github.com/leiye302/rethink-webshop-qwen25-3b),
+matched to commit `cb6e5d93929c4e33bb431b0cdcf353ea42196a91`.
+Both arms start from the **exact same public Route-SFT1500 checkpoint**.
+This is not a base-start baseline, pure GRPO or a fresh SFT run.
 
+| Component | Main method | This ablation |
+|---|---|---|
+| Actor start | Released3B Route-SFT1500 | Same files/SHA |
+| GRPO + ordinary OPSD / static skills | Enabled | Unchanged |
+| Teacher | Current pre-update Actor, no-gradient scoring | Unchanged |
+| Extra local hint at Actor RETHINK | Enabled | **Disabled; no API/Analyzer** |
+| Registered RETHINK | Normal free generation | Retained, neither forced nor suppressed |
+| Beta / OPSD coefficient / reference KL | 5 / .01 / .01 | Unchanged |
+| Training | 150 updates,16 tasks ×8 rollouts | Unchanged |
+| Validation | Initial/every10/final, shared140 | Same goals, seeds, sampling |
+| Saves | Every20/final150, newest2 | Unchanged |
+| Hardware | 4×A10080GB; FSDP4, TP2×DP2 | Unchanged |
 
-Route-SFT followed by **public SDAR GRPO+OPSD (gate beta 5)**, with extra
-Teacher-only local hints at decisions where the **Actor itself generates
-`<RETHINK>`**. This repository starts stage 2 from the released **1500-step
-WebShop Route-SFT checkpoint**, not from SEED/M1 or an Analyzer checkpoint.
+`configs/ablation.json` freezes the complete matched recipe and55 shared files.
+The only algorithm-configuration difference is
+`algorithm.local_hints.enabled: true -> false`.
+Loss/reward/prompt/environment, rollout budgets, tokenizer and evaluation are unchanged.
 
-The [1.5B companion](https://github.com/leiye302/rethink-webshop-qwen25-1.5b)
-starts from its public base and trains the same frozen SFT data first.
-Neither repository needs the authors' computer, servers, private datasets or
-preinstalled environments. Model weights are separate downloadable assets.
+## 1. Standalone installation (Linux)
 
-## What is fixed
-
-| Component | Recipe |
-|---|---|
-| Base | Qwen2.5-3B-Instruct, pinned revision in `configs/model.json` |
-| SFT data | 7,500 natural Good + 4,500 reviewed Bad; identical in both repositories |
-| SFT | 1 epoch / 1,500 updates; every batch 5 Good + 3 Bad; full parameters |
-| SFT loss | Sample-mean route/action/EOS CE + 0.1 independent full-vocabulary marker BCE; **no reference KL** |
-| Stage 2 | 150 GRPO+OPSD updates; beta=5, distillation coefficient=0.01 |
-| Teacher | Current Actor weights, no-gradient scoring view; **not a frozen initial Teacher** |
-| Hints | Static public SDAR WebShop skills everywhere; additional local API hint only at Actor-marker decisions |
-| Environment | SDAR default 1,000 products + synthetic goals, history 2, at most 15 actions |
-| Budgets | Prompt 4,096 / response 512; unchanged prompt/action parser/reward |
-| RL validation | Same shared fixed140 content goals for both arms/sizes, every 10 updates |
-| RL checkpoints | Every 20 updates and final 150; latest two complete native checkpoints |
-
-No API judges the routes. Student inputs never contain hints or retrospective
-labels. The final ALFWorld hint model and exact protocol are pinned to
-`glm-5.3-flash`; malformed/illegal hints fall back to static-skill Teacher.
-Transient transport/quota failures retain the same batch and wait, rather than
-silently dropping hints. Permanent configuration/auth and local disk errors stop
-visibly without an Actor update or repeat billing. Teacher-hint truncation fails visibly. See
-[the exact alignment and runtime corrections](docs/ALFWORLD_ALIGNMENT.md).
-
-## Installation (Linux x86-64)
-
-Two explicit environments keep the original SFT numerics and the native Ray/vLLM
-runtime separate. Python 3.10 and 3.12, Git, a CUDA 12.8-compatible NVIDIA driver,
-a CUDA toolkit for FlashAttention compilation, and Conda are prerequisites.
-Do not run these commands on occupied GPUs. Both training stages target
-**one node with 4×A100 80GB**: SFT uses four DDP ranks (2 samples/rank/update,
-global8); stage2 uses FSDP4 and **TP2×DP2** rollout. Offline evaluation uses one
-GPU. These are not single-24GB or multi-host memory-fit claims.
+Requires an allocated4×A10080GB node, CUDA12.8-compatible driver, CUDA toolkit
+for FlashAttention, Conda and Git. Do not use another job's GPUs.
+No author computer, private server, data path or API credential is required.
 
 ```bash
-git clone https://github.com/leiye302/rethink-webshop-qwen25-3b
-cd rethink-webshop-qwen25-3b
+git clone https://github.com/leiye302/rethink-webshop-qwen25-3b-no-local-hint
+cd rethink-webshop-qwen25-3b-no-local-hint
 conda create -y -p "$PWD/.venv-opsd" -c conda-forge python=3.10 openjdk=11
 conda activate "$PWD/.venv-opsd"
 python -m pip install --upgrade pip setuptools wheel packaging==25.0
 python scripts/install_opsd.py
 python -m pip install --no-build-isolation flash-attn==2.8.3
-mkdir -p assets
 export PYTHONPATH="$PWD/src:$PWD/.deps/sdar"
 python -m rethink_webshop.java --prepare
 python -m rethink_webshop.setup --framework --data
@@ -64,111 +45,77 @@ python -m pip check
 export JAVA_HOME="$PWD/assets/java"
 export JVM_PATH="$JAVA_HOME/lib/server/libjvm.so"
 bash scripts/prepare.sh
+python -m rethink_webshop.ablation
 python -m pytest -q
 python scripts/smoke_native.py
 ```
 
-`prepare.sh` fetches [public SDAR](https://github.com/ZJU-REAL/SDAR) at
-`d511f043afe9199b8576fc99ea52e12d84841f32`, applies the 3-file patch, verifies
-unchanged loss/skill/prompt sources, extracts the frozen SFT data, downloads
-checksum-pinned WebShop assets and builds native Lucene indexes. All caches,
-models and runs below this checkout are ignored by Git. No paid API or training
-is started during preparation. See [the environment/resource details](docs/REPRODUCING.md).
+The public SDAR source pin remains `d511f043afe9199b8576fc99ea52e12d84841f32`.
+Native loss/Teacher/prompt/parser/reward/static-skill hashes and the same thin
+shared140/telemetry patch are unchanged. Preparation does not start training.
 
-## 3B: start from the existing SFT checkpoint
-
-The original FP32 inference shards, tokenizer and configs are available as
-[release assets](https://github.com/leiye302/rethink-webshop-qwen25-3b/releases/tag/route-sft1500-v1).
-The downloader verifies **every file's size and SHA-256**, including the release
-manifest. No optimizer/RNG states or training logs are published.
-This is an initialization checkpoint, **not** an exact resume of SFT.
+## 2. Exact shared initialization
 
 Read and accept the [Qwen Research License](https://huggingface.co/Qwen/Qwen2.5-3B-Instruct/blob/aa8e72537993ba99e69dfaafa59ed015b17504d1/LICENSE)
-before downloading the 3B weights; they are **not Apache-2.0 model weights**.
+before downloading; these3B model weights are not Apache-2.0.
 
 ```bash
 python -m rethink_webshop.setup --checkpoint1500 --accept-model-license
-export HINT_API_BASE="https://your-provider.example/v1"
-export HINT_MODEL="glm-5.3-flash"
-read -rsp 'Hint API key: ' HINT_API_KEY; echo
-export HINT_API_KEY
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/train_opsd.sh --allow-api-cost
 ```
 
-Use a compatible provider serving the fixed `glm-5.3-flash` model and final
-ALFWorld request parameters; do not substitute the annotation model.
-No key or API credits are included. Use a process manager
-you control for an unattended job. To resume the latest native checkpoint of the
-same run, add `--resume`; never change the initialization/data/recipe in place.
+`configs/checkpoint1500.json` downloads the same21 files from the declared public
+[main-method Route-SFT1500 release](https://github.com/leiye302/rethink-webshop-qwen25-3b/releases/tag/route-sft1500-v1),
+checking every size/SHA. This includes original7 FP32 weight shards (about12.34GB),
+tokenizer and manifest. No second repository needs to be cloned or installed.
+Do not retrain SFT: the same recipe does not guarantee identical initial weights.
+Any explicit `--actor` must contain the same checksum-pinned artifact.
 
-Before allocating GPUs, check the configured API and writable cache with no model
-or SDAR installation required:
+## 3. Train150 updates, no API setup
 
 ```bash
-PYTHONPATH="$PWD/src" python -m rethink_webshop.hint_api --check
-# Explicit opt-in: one fresh synthetic request through the training transport/parser.
-PYTHONPATH="$PWD/src" python -m rethink_webshop.hint_api --check --allow-api-cost
+CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/train_opsd.sh
+# Resume only the same complete ablation run.
+CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/train_opsd.sh --resume
 ```
 
-The first command makes no network request. Neither command trains or uses CUDA.
-Do not put keys in command arguments. Proxy use is unchanged by default; opt out
-only if appropriate for your network with `RETHINK_HINT_TRUST_ENV=false`.
-See [API diagnosis, failure handling and update/resume boundaries](docs/API_TROUBLESHOOTING.md).
+Default Actor: `assets/route-sft1500`. Output:
+`runs/sft_start_grpo_opsd/{checkpoints,rollouts,validation}`.
+All decisions use the ordinary native `_compute_teacher_log_probs` branch,
+including decisions where the Actor generates RETHINK. Static skills remain
+Teacher-only; Student context/responses/rewards and native losses are unchanged.
+Teacher uses current Actor weights, not a frozen initial model.
 
-## Optional: reproduce Route-SFT from base
+**Do not use `--baseline`**: in the main repository it means base-start and is
+rejected here. There is no `--allow-api-cost` training flag or key loading.
+Inherited hint modules/tests remain reference code, not an active training path.
+Do not mix main-method/base-start run directories or bypass resume identity checks.
+Reserve disk for the initialization, dependencies/assets, two complete native
+checkpoints and an in-progress save. Latest2 retention is unchanged.
+
+## 4. Same fixed140 evaluation
 
 ```bash
-python3.12 -m venv .venv-sft
-.venv-sft/bin/pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cu128
-.venv-sft/bin/pip install -r configs/requirements-sft.txt
-python -m rethink_webshop.setup --base --accept-model-license
-.venv-sft/bin/python -m rethink_webshop.audit_data
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/train_sft.sh
+CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/eval.sh \
+  --model assets/route-sft1500 --output runs/eval_initial
+# Evaluate trained complete HF exports with the same entry point.
 ```
 
-The script first runs disposable numerical/memory checks, reloads the pinned base,
-then trains the unchanged loss/sampler. It saves complete resumable SFT checkpoints
-at 750/1500 and evaluates validation loss, 200 empty-assistant-prefix generations
-and the shared140 native episodes (temperature0.4). Resume explicitly with
-`bash scripts/train_sft.sh --resume runs/sft/checkpoint_000750` under the same
-four-GPU allocation. SFT resume includes the four per-rank RNG states; old
-single/two-rank optimizer checkpoints cannot resume this topology. The released
-inference weights remain valid for fresh four-GPU stage2 initialization.
-An optional newly trained initialization can be selected by
-`--actor runs/sft/checkpoint_001500/model` for stage 2.
+Uses the same140 synthetic native WebShop goals, explicitly excluded from
+training, and worker seeds1000..1139. It is not the official human500.
+Temperature.4, sampling, top-p1, unrestricted top-k, n1, history2, prompt4096,
+response512 and15 actions are unchanged. Evaluation has no API or forced route.
+See [shared140 contract](docs/SHARED_EVALUATION140.md). Report success and task
+score separately; marker rate is a fraction of active decisions, not tokens.
 
-## Matched baseline and evaluation
+## Contract, interpretation and verification
 
-```bash
-# Same native GRPO+OPSD beta5, from base, with NO local hint API.
-python -m rethink_webshop.setup --base --accept-model-license
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/train_opsd.sh --baseline --run-dir runs/baseline
+- [Exact ablation and invariants](docs/ABLATION.md)
+- `configs/ablation.json`: immutable parent, matched recipe and shared source/data locks.
+- `configs/checkpoint1500.json`: exact public initialization.
+- [Third-party licenses/resources](THIRD_PARTY.md).
 
-# Formal native shared140 evaluation, no API, shared140 goals; native vLLM, temperature0.4.
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/eval.sh --model assets/base --output runs/eval_base
-CUDA_VISIBLE_DEVICES=0,1,2,3 bash scripts/eval.sh --model assets/route-sft1500 --output runs/eval_sft1500
-```
-
-Formal evaluation and RL validation use the same shared140 native protocol:
-temperature0.4, sampling, top-p1, unrestricted top-k, one rollout/task,
-history2, prompt4096, response512 and15 environment steps. No hint API is used
-at evaluation. The200-H greedy generation probe is a separate SFT diagnostic.
-Old128/greedy scores are not relabeled. See the exact shared contract above.
-Report native success and mean raw task score separately. Marker rate counts
-marker-bearing active decisions, not a fraction of generated tokens. Source
-Good/Bad groups are not labels for freshly generated reasoning.
-
-## Method and verification boundaries
-
-- [Exact method/data/loss and information flow](docs/METHOD.md)
-- [Minimal upstream differences](docs/UPSTREAM_DIFF.md)
-- [Resource, dependency, evaluation and recovery details](docs/REPRODUCING.md)
-- [Data notice](data/README.md) and [licenses](THIRD_PARTY.md)
-
-CPU tests exercise the exact upstream Teacher builder, unchanged Student response
-tokens, row identity after reordering, full-vocabulary BCE/masking, frozen data,
-API hold/fallback boundaries and source hashes. A clean-checkout CPU test is **not** a new
-GPU/vLLM/150-update training reproduction. A real four-process CPU DDP test checks
-the same SFT accumulation, updates and checkpoint/resume against serial execution;
-see `docs/VERIFICATION.md` for the
-checks actually executed. No 1.5B result is inferred from the released 3B weights.
+CPU tests exercise the exact native no-hint Teacher branch, same-start guards,
+no-API preparation and inherited contracts. Clean CI also checks native WebShop
+reset/search/feedback. This is code/configuration publication, not a new GPU
+training result, memory-fit claim or performance score. Inherited main-method
+documents are labeled references; this README and ABLATION.md define the active control.

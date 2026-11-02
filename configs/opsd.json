@@ -4,7 +4,7 @@
   "algorithm.sdar.sdar_coef": 0.01,
   "algorithm.sdar.gate_beta": 5.0,
   "algorithm.sdar.skill_all": false,
-  "algorithm.local_hints.enabled": true,
+  "algorithm.local_hints.enabled": false,
   "algorithm.local_hints.workers": 4,
   "algorithm.local_hints.timeout_seconds": 120,
   "algorithm.local_hints.retries": 5,

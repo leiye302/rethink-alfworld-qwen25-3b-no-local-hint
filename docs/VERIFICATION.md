@@ -1,5 +1,10 @@
 # Publication verification
 
+> Inherited main-method reference, not the active no-local-hint training recipe.
+> This repository uses the same Route-SFT1500 start and ordinary GRPO+OPSD only;
+> no local hint API is called. See [the ablation contract](ABLATION.md) and the
+> repository README for launch commands and current verification boundaries.
+
 ## API resilience checks (2026-11-02)
 
 Both model-size trees passed **86 CPU tests with one Windows-only platform skip**,

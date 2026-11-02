@@ -1,5 +1,10 @@
 # API connection checks and failure handling
 
+> Inherited main-method reference, not the active no-local-hint training recipe.
+> This repository uses the same Route-SFT1500 start and ordinary GRPO+OPSD only;
+> no local hint API is called. See [the ablation contract](ABLATION.md) and the
+> repository README for launch commands and current verification boundaries.
+
 This is transport engineering, not an algorithm or prompt change. Both backbone
 sizes use identical code. The model remains `glm-5.3-flash`, Actor marker IDs alone
 select local-hint targets, hints go only to the current-Actor Teacher, and SDAR's

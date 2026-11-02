@@ -17,7 +17,9 @@ jobs:
       - name: Fetch and check exact public upstream
         env:
           PYTHONPATH: src
-        run: python -m rethink_webshop.setup --framework --data --verify
+        run: |
+          python -m rethink_webshop.setup --framework --data --verify
+          python -m rethink_webshop.ablation
       - name: CPU tests including actual upstream Teacher builder
         run: pytest -q
       - name: Publication privacy and historical blobs

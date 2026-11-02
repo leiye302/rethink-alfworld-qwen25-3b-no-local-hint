@@ -1,5 +1,10 @@
 # Resources, execution and recovery
 
+> Inherited main-method reference, not the active no-local-hint training recipe.
+> This repository uses the same Route-SFT1500 start and ordinary GRPO+OPSD only;
+> no local hint API is called. See [the ablation contract](ABLATION.md) and the
+> repository README for launch commands and current verification boundaries.
+
 ## Public resources only
 
 - SDAR commit and 3-file patch: `configs/upstream.json`.

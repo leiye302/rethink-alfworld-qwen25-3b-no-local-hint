@@ -1,0 +1,305 @@
+{
+  "schema": "webshop-same-start-no-local-hint-v1",
+  "matched_method": {
+    "repository": "https://github.com/leiye302/rethink-webshop-qwen25-3b",
+    "commit": "cb6e5d93929c4e33bb431b0cdcf353ea42196a91"
+  },
+  "initialization": {
+    "release_repository": "leiye302/rethink-webshop-qwen25-3b",
+    "tag": "route-sft1500-v1",
+    "step": 1500,
+    "lock": "configs/checkpoint1500.json",
+    "require_exact_files": true
+  },
+  "only_algorithm_delta": "algorithm.local_hints.enabled: true -> false",
+  "matched_method_recipe": {
+    "algorithm.adv_estimator": "grpo",
+    "algorithm.use_kl_in_reward": false,
+    "algorithm.sdar.sdar_coef": 0.01,
+    "algorithm.sdar.gate_beta": 5,
+    "algorithm.sdar.skill_all": false,
+    "algorithm.local_hints.enabled": true,
+    "algorithm.local_hints.workers": 4,
+    "algorithm.local_hints.timeout_seconds": 120,
+    "algorithm.local_hints.retries": 5,
+    "data.train_batch_size": 16,
+    "data.val_batch_size": 140,
+    "data.max_prompt_length": 4096,
+    "data.max_response_length": 512,
+    "data.filter_overlong_prompts": true,
+    "data.truncation": "error",
+    "data.return_raw_chat": true,
+    "actor_rollout_ref.actor.optim.lr": 0.000001,
+    "actor_rollout_ref.model.use_remove_padding": true,
+    "actor_rollout_ref.actor.ppo_mini_batch_size": 64,
+    "actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu": 4,
+    "actor_rollout_ref.actor.use_kl_loss": true,
+    "actor_rollout_ref.actor.kl_loss_coef": 0.01,
+    "actor_rollout_ref.actor.kl_loss_type": "low_var_kl",
+    "actor_rollout_ref.model.enable_gradient_checkpointing": true,
+    "actor_rollout_ref.actor.fsdp_config.param_offload": false,
+    "actor_rollout_ref.actor.fsdp_config.optimizer_offload": false,
+    "actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu": 8,
+    "actor_rollout_ref.rollout.tensor_model_parallel_size": 2,
+    "actor_rollout_ref.rollout.name": "vllm",
+    "actor_rollout_ref.rollout.gpu_memory_utilization": 0.6,
+    "actor_rollout_ref.rollout.enable_chunked_prefill": false,
+    "actor_rollout_ref.rollout.enforce_eager": false,
+    "actor_rollout_ref.rollout.free_cache_engine": false,
+    "actor_rollout_ref.rollout.val_kwargs.temperature": 0.4,
+    "actor_rollout_ref.rollout.val_kwargs.do_sample": true,
+    "actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu": 8,
+    "actor_rollout_ref.ref.fsdp_config.param_offload": true,
+    "actor_rollout_ref.actor.use_invalid_action_penalty": true,
+    "actor_rollout_ref.actor.invalid_action_penalty_coef": 0.1,
+    "env.env_name": "Webshop",
+    "env.seed": 0,
+    "env.max_steps": 15,
+    "env.history_length": 2,
+    "env.webshop.use_small": true,
+    "env.webshop.human_goals": false,
+    "env.rollout.n": 8,
+    "env.resources_per_worker.num_cpus": 0.1,
+    "trainer.critic_warmup": 0,
+    "trainer.logger": [
+      "console"
+    ],
+    "trainer.project_name": "rethink_webshop",
+    "trainer.n_gpus_per_node": 4,
+    "trainer.nnodes": 1,
+    "trainer.ray_wait_register_center_timeout": 600,
+    "trainer.save_freq": 20,
+    "trainer.test_freq": 10,
+    "trainer.total_epochs": 150,
+    "trainer.total_training_steps": 150,
+    "trainer.val_before_train": true,
+    "trainer.max_actor_ckpt_to_keep": 2,
+    "trainer.max_critic_ckpt_to_keep": 2,
+    "ray_init.num_gpus": 4,
+    "actor_rollout_ref.rollout.val_kwargs.top_p": 1,
+    "actor_rollout_ref.rollout.val_kwargs.top_k": -1,
+    "actor_rollout_ref.rollout.val_kwargs.n": 1
+  },
+  "shared_files": {
+    "configs/assets.json": {
+      "mode": "utf8_lf",
+      "sha256": "f8313d36b83df707e2f44b85fd2a07aa765ad82e3ee9cc9f26620e92e34cc81a"
+    },
+    "configs/checkpoint1500.json": {
+      "mode": "utf8_lf",
+      "sha256": "5a85fc645796fab22a723b3531f7ebf16dbe070bfa65943ab900490ebb5a8ed8"
+    },
+    "configs/data.json": {
+      "mode": "utf8_lf",
+      "sha256": "ced581119b3fd90ad96c1186441fceb20063d0145f7f95e61d318f0f4899e632"
+    },
+    "configs/eval128.json": {
+      "mode": "utf8_lf",
+      "sha256": "7dfc00497e2a964344fdcd1db336ed6a6680e88ff66f6e33db4765eeb01fc3ac"
+    },
+    "configs/evaluation_protocol.json": {
+      "mode": "utf8_lf",
+      "sha256": "8c7f39163ceb9897eb43f24db6239d957eece0bc3f931a1c25f197d5dec26f23"
+    },
+    "configs/fixed_validation140.json": {
+      "mode": "utf8_lf",
+      "sha256": "706adb889929acc45bafd52fc144cd160b85ee7f752adf7b6dad8699f8c5ce4a"
+    },
+    "configs/hint_protocol.json": {
+      "mode": "utf8_lf",
+      "sha256": "111786d0c07f18df30fb99edacbd37edb6156ce61acf6866926efc398402fade"
+    },
+    "configs/model.json": {
+      "mode": "utf8_lf",
+      "sha256": "fe75e745e80c4eca034cd43b6603d8efb2218904393d6b061e3463804d5465e9"
+    },
+    "configs/model.lock.json": {
+      "mode": "utf8_lf",
+      "sha256": "ededacd4db550c7c0f01188c8e32d9edc131debb8a3cc55714d696a7641ef10d"
+    },
+    "configs/native.json": {
+      "mode": "utf8_lf",
+      "sha256": "49f1a1253f896eaff6626e95a808e91fabeb56d7bb1ebbca0e8c6b850915ab54"
+    },
+    "configs/native_source.lock.json": {
+      "mode": "utf8_lf",
+      "sha256": "a92bbaf6437200d2691dc88b8eeddd3af5eb6713946e928047ac86316c412751"
+    },
+    "configs/reference.lock.json": {
+      "mode": "utf8_lf",
+      "sha256": "dda8e342fda1a15dd5eb342bfa761672c9d5a8b0c1efaf711f7775a3595c48b0"
+    },
+    "configs/requirements-cpu.txt": {
+      "mode": "utf8_lf",
+      "sha256": "bf40c2217d2e38066391e37cf8584acffc248a3098e623801fa2dd66891dacb4"
+    },
+    "configs/requirements-native-cpu.txt": {
+      "mode": "utf8_lf",
+      "sha256": "36212ad9c3e7e1b67a10c32d2ea81e0a9ab5553e35d3452e9a3a34c64749d188"
+    },
+    "configs/requirements-opsd.txt": {
+      "mode": "utf8_lf",
+      "sha256": "05955de99847ccd44d5e9ef3e83f24ab41d3e10760130f8e83ec0e5c6332552b"
+    },
+    "configs/requirements-sft.txt": {
+      "mode": "utf8_lf",
+      "sha256": "1840414259a88cbbebb5d3b0fbd52d7ad8a582267f6fb0490298d579ff8cea11"
+    },
+    "configs/sft.json": {
+      "mode": "utf8_lf",
+      "sha256": "b948b989a35632c7ff5ab3d7f1df6c7b64c362d17e8ba1f3a84fc793b9f13dba"
+    },
+    "configs/task_split.json": {
+      "mode": "utf8_lf",
+      "sha256": "6055ef05de812132425060ad959d11bd6ca1cbe40a94f9a195f9f0647ae9547c"
+    },
+    "configs/upstream.json": {
+      "mode": "utf8_lf",
+      "sha256": "504ae960452fff6eb7b609b547b0969b57570ca8a551333aecafa510420a33b8"
+    },
+    "data/README.md": {
+      "mode": "utf8_lf",
+      "sha256": "905438c155f90e93cdd70acf2b8193d361e2d0f8f2419f4a9906a52f1be4b210"
+    },
+    "data/frozen_sft.zip": {
+      "mode": "binary",
+      "sha256": "d15fefd08f2707ff93eff7f6aa55c82f5ac2f2e307c3f4b904b9ce98d075d1f7"
+    },
+    "patches/sdar.patch": {
+      "mode": "utf8_lf",
+      "sha256": "dc59eac43cdda6f19b57aa01f71d016fcb8d0322987129495d87660804b68242"
+    },
+    "src/evaluation_contract.py": {
+      "mode": "utf8_lf",
+      "sha256": "2dd8bc5bebee7a5a433c2eec08fd74cb1d2acadc9c3e3241d0abb6fbb2dc3a8e"
+    },
+    "src/rethink_webshop/__init__.py": {
+      "mode": "utf8_lf",
+      "sha256": "978ea9937e63db405c8ed93fc4eedec921665f0e8349fdfc594f1489f2823e40"
+    },
+    "src/rethink_webshop/assets.py": {
+      "mode": "utf8_lf",
+      "sha256": "4306ce6d511e067eb9695d2e1624df9f604736ba1e24d2f9865092cf981edf15"
+    },
+    "src/rethink_webshop/audit_data.py": {
+      "mode": "utf8_lf",
+      "sha256": "e1d0a709916ff6b3f42da5ad91c7cd7693bf0b6973192470a137682aaf464d18"
+    },
+    "src/rethink_webshop/benchmark_metrics.py": {
+      "mode": "utf8_lf",
+      "sha256": "038b8c8f97a5b23cd81eb707aeb51e730e7383ad4ee08759576bd06f3c14b661"
+    },
+    "src/rethink_webshop/common.py": {
+      "mode": "utf8_lf",
+      "sha256": "4f1e257fc7b62ef13de9f9e2abf50601b3b9c48cc11d56ffc50be7b6c75abf5b"
+    },
+    "src/rethink_webshop/eval.py": {
+      "mode": "utf8_lf",
+      "sha256": "e850efab1196ecbd142f32038a5c9e59dc0ec2b8e3d3f313c5d76277b71d5dae"
+    },
+    "src/rethink_webshop/fixed_validation.py": {
+      "mode": "utf8_lf",
+      "sha256": "88201cc4cbf21004482aee137d3ccb22a6e2d63d84cec688933b41efe259f97d"
+    },
+    "src/rethink_webshop/hardware.py": {
+      "mode": "utf8_lf",
+      "sha256": "568d15a33c98a512d33cafb885d150ce243e09d83020260935921399693a11a5"
+    },
+    "src/rethink_webshop/hint_api.py": {
+      "mode": "utf8_lf",
+      "sha256": "7601930077a6b340c11c1fd9bd19e141a66551601fd1907e229042000c38eb21"
+    },
+    "src/rethink_webshop/hints.py": {
+      "mode": "utf8_lf",
+      "sha256": "82dc5b4629e3439d23607e5a9f9245084c48fdfa20066b4c8176eb2bd27b0dfa"
+    },
+    "src/rethink_webshop/java.py": {
+      "mode": "utf8_lf",
+      "sha256": "f268219f075a8cbb7500c843a89e84464991706bd71b162b3211c3600f546d4a"
+    },
+    "src/rethink_webshop/rethink_api_protocol.py": {
+      "mode": "utf8_lf",
+      "sha256": "ce4c90a088aff29173514fb08f6a8b8966c2b7f39eb0ad2202f9d91380eed539"
+    },
+    "src/rethink_webshop/rethink_benchmark_contract.py": {
+      "mode": "utf8_lf",
+      "sha256": "b0d10d5add932c7201c4a4f9f4bb842b2fdfb6867ea8b369bd938fdf6ead6b60"
+    },
+    "src/rethink_webshop/setup.py": {
+      "mode": "utf8_lf",
+      "sha256": "8ae0ad0520cfc8e524aab1dd1306348059bb5ad6f5d2b79c4fff4772bfc6c371"
+    },
+    "src/rethink_webshop/task_split.py": {
+      "mode": "utf8_lf",
+      "sha256": "db242a5b29acf677491764d95afea4692020888313d21cd60dca64eec978d94f"
+    },
+    "src/rethink_webshop/trainer.py": {
+      "mode": "utf8_lf",
+      "sha256": "05cdbb4315c67d6181aa6f67a5a4e68b0011873745a159e93ead0aebb0386735"
+    },
+    "src/rethink_webshop/validation.py": {
+      "mode": "utf8_lf",
+      "sha256": "41e110d3db306ee80985ded8eb710426906aba7ef3bc4a625d12d104a13aa424"
+    },
+    "src/rethink_webshop/webshop_worker.py": {
+      "mode": "utf8_lf",
+      "sha256": "9e3e7074c39a6d24cab33d550ffcd200a837139beb34f2ae661edf72d303520b"
+    },
+    "src/sft/cpu_offload.py": {
+      "mode": "utf8_lf",
+      "sha256": "2d250347d519c3e78fbb645d53fc869cc746b239d4b1b7beee5261a9b6a3467a"
+    },
+    "src/sft/deadline_policy.py": {
+      "mode": "utf8_lf",
+      "sha256": "72e810408940db67fa89c76fcb2f0dbe9d15dc90c4555d127c72bb288972b41f"
+    },
+    "src/sft/distributed.py": {
+      "mode": "utf8_lf",
+      "sha256": "f2ce8946454dea5eb4ab9c6baf21123e7e348a8db81dd7ec37059444ef3fb902"
+    },
+    "src/sft/evaluation.py": {
+      "mode": "utf8_lf",
+      "sha256": "650fadb6b78db4f84c71e3b64be812a516db09ad44b25c2cbc01dcacb32f0381"
+    },
+    "src/sft/gpu_resident.py": {
+      "mode": "utf8_lf",
+      "sha256": "841a9242936a482a15c37b0348732ab6a307dc5056398372d544370ca1f8f852"
+    },
+    "src/sft/native_worker.py": {
+      "mode": "utf8_lf",
+      "sha256": "023cd2e22ca7fce47e87d6d25971be65fc7cf249e0ddb5d97d5caf3bbac59905"
+    },
+    "src/sft/train.py": {
+      "mode": "utf8_lf",
+      "sha256": "ea69f4599a8eef78345bc920703b10243012cd180076ab0861e011298e006459"
+    },
+    "src/sft_reference/legacy/rethink_token.py": {
+      "mode": "utf8_lf",
+      "sha256": "6997bc8b357be62e02053580f5540cccb1d52a831aa482cf43c4a2fb095eb404"
+    },
+    "src/sft_reference/legacy/stage1_training.py": {
+      "mode": "utf8_lf",
+      "sha256": "26fa0b464eafb02622efc5ace7e8f22858d45080681d9dbeab73e30988c6f23b"
+    },
+    "src/sft_reference/route_bce/__init__.py": {
+      "mode": "utf8_lf",
+      "sha256": "8f17e2c9811859857b48512213a5572749321f8bd35fa9437cbeea95ecedf2bc"
+    },
+    "src/sft_reference/route_bce/core.py": {
+      "mode": "utf8_lf",
+      "sha256": "634806f26c2f9a859523ead6707c89eb125c83715153d0dd48c6a204b07c119f"
+    },
+    "src/webshop_data/__init__.py": {
+      "mode": "utf8_lf",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "src/webshop_data/common.py": {
+      "mode": "utf8_lf",
+      "sha256": "bd023c0a75b8d3e1615b551bff724dba56aa281c517b40633bc53389a6a0d27c"
+    },
+    "src/webshop_data/native.py": {
+      "mode": "utf8_lf",
+      "sha256": "82707379aec96d2aab35afd3cb068aab2d7f919596e6bc0b94905af867dc6f3b"
+    }
+  }
+}

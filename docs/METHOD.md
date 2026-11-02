@@ -1,5 +1,10 @@
 # Method and data contract
 
+> Inherited main-method reference, not the active no-local-hint training recipe.
+> This repository uses the same Route-SFT1500 start and ordinary GRPO+OPSD only;
+> no local hint API is called. See [the ablation contract](ABLATION.md) and the
+> repository README for launch commands and current verification boundaries.
+
 ## Stage 1: Route-SFT
 
 The policy starts directly from the pinned public Qwen2.5 Instruct model. No

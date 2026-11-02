@@ -17,7 +17,8 @@ def test_formal_sampling_and_api_disabled(tmp_path):
     assert cfg.trainer.test_freq == 10
     assert cfg.ray_init.runtime_env.env_vars.RETHINK_RUN_DIR == str(tmp_path/'output')
     source=(ROOT/'src/rethink_webshop/run.py').read_text(encoding='utf-8')
-    assert "if not a.baseline and not a.eval_only:" in source
+    assert 'verify_recipe()' in source and 'verify_initialization(actor,identity)' in source
+    assert 'HINT_API_KEY' not in source and 'from .hint_api import' not in source
     assert "OmegaConf.update(cfg,'algorithm.local_hints.enabled',False" in source
     assert 'from rethink_webshop.trainer import WebShopTrainer as SkillSDRayTrainer' in (ROOT/'.deps/sdar/verl/trainer/main_sdar.py').read_text()
 
