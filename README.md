@@ -32,8 +32,9 @@ preinstalled environments. Model weights are separate downloadable assets.
 No API judges the routes. Student inputs never contain hints or retrospective
 labels. The final ALFWorld hint model and exact protocol are pinned to
 `glm-5.3-flash`; malformed/illegal hints fall back to static-skill Teacher.
-Transport/auth/quota failures retain the same batch and wait, rather than
-silently dropping hints. Teacher-hint truncation fails visibly. See
+Transient transport/quota failures retain the same batch and wait, rather than
+silently dropping hints. Permanent configuration/auth and local disk errors stop
+visibly without an Actor update or repeat billing. Teacher-hint truncation fails visibly. See
 [the exact alignment and runtime corrections](docs/ALFWORLD_ALIGNMENT.md).
 
 ## Installation (Linux x86-64)
@@ -99,6 +100,20 @@ ALFWorld request parameters; do not substitute the annotation model.
 No key or API credits are included. Use a process manager
 you control for an unattended job. To resume the latest native checkpoint of the
 same run, add `--resume`; never change the initialization/data/recipe in place.
+
+Before allocating GPUs, check the configured API and writable cache with no model
+or SDAR installation required:
+
+```bash
+PYTHONPATH="$PWD/src" python -m rethink_webshop.hint_api --check
+# Explicit opt-in: one fresh synthetic request through the training transport/parser.
+PYTHONPATH="$PWD/src" python -m rethink_webshop.hint_api --check --allow-api-cost
+```
+
+The first command makes no network request. Neither command trains or uses CUDA.
+Do not put keys in command arguments. Proxy use is unchanged by default; opt out
+only if appropriate for your network with `RETHINK_HINT_TRUST_ENV=false`.
+See [API diagnosis, failure handling and update/resume boundaries](docs/API_TROUBLESHOOTING.md).
 
 ## Optional: reproduce Route-SFT from base
 
