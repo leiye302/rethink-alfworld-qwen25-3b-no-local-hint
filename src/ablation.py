@@ -16,7 +16,7 @@ def contract():
         raise ValueError('The ablations must use the pinned Qwen2.5-3B base')
     if value['API_at_evaluation'] is not False:
         raise ValueError('Both ablations require API-free evaluation')
-    if value['sft_enabled'] is not True or value['teacher_hint_route'] != 'disabled':
+    if value['sft_enabled'] is not True or value.get('auto_sft') is not False or value['teacher_hint_route'] != 'disabled':
         raise ValueError('SFT enablement does not match the declared ablation')
     return value
 

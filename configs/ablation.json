@@ -4,6 +4,7 @@
   "base_model": "Qwen/Qwen2.5-3B-Instruct",
   "base_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
   "sft_enabled": true,
+  "auto_sft": false,
   "opsd_initialization": "shared_full_route_sft_step2000",
   "teacher_hint_route": "disabled",
   "API_at_evaluation": false,

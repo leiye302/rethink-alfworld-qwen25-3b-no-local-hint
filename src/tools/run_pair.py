@@ -59,8 +59,9 @@ def sft_complete():
 def commands(arm, resume=False):
     if arm!='opsd':raise ValueError('This repository runs only its declared ablation, not an extra baseline')
     py = resolve_python(os.environ.get("OPSD_PYTHON", ".venv-opsd/bin/python"), ROOT)
+    verify_start(ROOT / "checkpoints/route_sft/global_step_2000")
     result = []
-    if contract()["sft_enabled"] and arm == "opsd" and not sft_complete():
+    if contract()["sft_enabled"] and contract().get("auto_sft", True) and arm == "opsd" and not sft_complete():
         existing = ROOT / "checkpoints/route_sft"
         options = []
         if existing.exists():

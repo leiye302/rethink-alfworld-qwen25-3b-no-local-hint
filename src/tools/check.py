@@ -84,15 +84,8 @@ def main():
         for name, wanted in data['files'].items():
             assert sha(ROOT / 'data' / name) == wanted, 'Frozen data mismatch: ' + name
         model = ROOT / 'checkpoints/route_sft/global_step_2000'
-        if model.is_dir():
-            from shared_start import verify_start
-            verify_start(model)
-        else:
-            model = ROOT / cfg['parent_dir']
-            receipt = json.loads((model / 'parent_download_receipt.json').read_text())
-            assert receipt['model_id'] == cfg['base_model'] and receipt['revision'] == cfg['base_revision']
-            for item in receipt['files']:
-                assert sha(model / item['name']) == item['sha256']
+        from shared_start import verify_start
+        verify_start(model)
         check_framework()
         assets = Path(os.environ['ALFWORLD_DATA']).resolve()
         for item in tasks:

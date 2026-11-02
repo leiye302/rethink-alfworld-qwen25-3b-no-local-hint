@@ -94,7 +94,8 @@ bash scripts/reproduce.sh --run --resume
 
 No API key or paid-call permission is requested. The shell and launch code reject
 API/router enablement rather than silently turning it back on.
-The controller skips SFT when the released shared initialization was imported.
+The controller requires the shared initialization and never auto-retrains SFT
+as a fallback for missing/corrupt weights. SFT reproduction is explicit only.
 It trains150 updates, exports update150, and evaluates fixed seen140.
 It never launches another baseline. Keep the newest two complete RL checkpoints.
 

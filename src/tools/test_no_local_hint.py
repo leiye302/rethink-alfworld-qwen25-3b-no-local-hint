@@ -17,6 +17,19 @@ from ablation import contract
 
 
 class NoHintTests(unittest.TestCase):
+    def test_pipeline_requires_shared_model_and_never_auto_retrains_sft(self):
+        import run_pair
+        with patch.object(run_pair, 'resolve_python', return_value=sys.executable), \
+                patch.object(run_pair, 'verify_start', side_effect=ValueError('Missing shared start')), \
+                patch.object(run_pair, 'sft_complete', side_effect=AssertionError('Must not bootstrap SFT')):
+            with self.assertRaisesRegex(ValueError, 'Missing shared start'):
+                run_pair.commands('opsd')
+        with patch.object(run_pair, 'resolve_python', return_value=sys.executable), \
+                patch.object(run_pair, 'verify_start', return_value={'fixture': 'verified'}), \
+                patch.object(run_pair, 'sft_complete', side_effect=AssertionError('Must not bootstrap SFT')):
+            self.assertEqual([name for name, _ in run_pair.commands('opsd')],
+                             ['training', 'export', 'evaluation'])
+
     def test_exactly_one_stage2_algorithm_setting_changes(self):
         import yaml
         reference = json.loads((ROOT / 'configs/reference_3b.json').read_text())
